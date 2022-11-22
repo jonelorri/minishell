@@ -6,7 +6,7 @@ RM= rm -rf
 FILES= 	testeo \
 		ft_strncmp \
 
-LIBFT = libftt/libft.a
+LIBFT = libft/libft.a
 
 READLINE_DIR = ${HOME}/.brew/opt/readline
 

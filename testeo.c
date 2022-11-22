@@ -111,13 +111,11 @@ static char	**ft_res_pointer(int ptr)
 
 char	**ft_splitraro(char const *s, char c)
 {
-	int		i;
 	int		ptr;
 	char	**array;
 
 	if (!s)
 		return (NULL);
-	i = 0;
 	ptr = ft_len_ptr((char *)s, c);
 	array = ft_res_pointer(ptr);
 	if (ptr > 0)
@@ -177,9 +175,9 @@ int	main(int argc, char **argv, char **env)
 	char		**ptr2;
 
 	ptr2 = ft_getpath(env);
-	argc = 0;
 	argv[1] = NULL;
 	int i;
+	i = argc;
 	i = 0;
 	while (ptr2[i])
 	{
