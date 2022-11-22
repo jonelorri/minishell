@@ -158,7 +158,9 @@ int checker(char **paths, char *src)
 		exit (-1);
 	else if (!get_cmd(paths, src))
 		return(0);
-	printf("existe el comando -> ");
+	printf("existe el cmd - ");
+	// la salida de este preceso hay que cambiar con dup2
+	// execve(get_cmd(paths, src), &src, env);
 	return (0);
 }
 /*
@@ -206,7 +208,7 @@ int	main(int argc, char **argv, char **env)
 		i++;
 	}
 	printf("\n");
-	src = "Minishell>";
+	src = "\033[0;32mMinishell>\033[0m";
 	while (1)
 	{
 	ptr = readline(src);
