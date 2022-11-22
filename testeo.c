@@ -134,10 +134,31 @@ char	**ft_splitraro(char const *s, char c)
 	return(-1);
 }*/
 
-int checker(char *src)
+static char	*get_cmd(char **paths, char *cmd)
+{
+	char	*tmp;
+	char	*command;
+
+	while (*paths)
+	{
+		tmp = ft_strjoin(*paths, "/");
+		command = ft_strjoin(tmp, cmd);
+		free(tmp);
+		if (access(command, 0) == 0)
+			return (command);
+		free(command);
+		paths++;
+	}
+	return (NULL);
+}
+
+int checker(char **paths, char *src)
 {
 	if (!ft_strncmp(src, "exit", 4))
 		exit (-1);
+	else if (!get_cmd(paths, src))
+		return(0);
+	printf("existe el comando -> ");
 	return (0);
 }
 /*
@@ -149,6 +170,7 @@ int	ft_strlen(char *str)
 	
 }
 */
+
 char	**ft_getpath(char **env)
 {
 	int		i;
@@ -183,11 +205,12 @@ int	main(int argc, char **argv, char **env)
 		printf("%s\n", ptr2[i]);
 		i++;
 	}
+	printf("\n");
 	src = "Minishell>";
 	while (1)
 	{
 	ptr = readline(src);
-	checker(ptr);
+	checker(ptr2, ptr);
 	if (ft_strlen(ptr))
 		add_history(ptr);
 	printf("%s\n",  ptr);
