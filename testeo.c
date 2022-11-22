@@ -138,8 +138,7 @@ int checker(char *src)
 {
 	if (!ft_strncmp(src, "exit", 4))
 		exit (-1);
-	else
-		return (0);
+	return (0);
 }
 /*
 int	ft_strlen(char *str)
