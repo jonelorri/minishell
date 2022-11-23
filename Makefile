@@ -1,12 +1,12 @@
 NAME= Minishell
 CC= gcc
-CFLAGS= -Wall -Wextra -Werror -g3
+#CFLAGS= -Wall -Wextra -Werror -g3
 #SANITIZE= -fsanitize=address
 RM= rm -rf
 FILES= 	testeo \
 		ft_strncmp \
 
-LIBFT = libft/libft.a
+LIBFT = libftt/libft.a
 
 READLINE_DIR = ${HOME}/.brew/opt/readline
 

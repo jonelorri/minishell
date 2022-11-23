@@ -6,7 +6,7 @@
 /*   By: ibaines <ibaines@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/17 18:14:39 by ibaines           #+#    #+#             */
-/*   Updated: 2022/11/21 19:51:21 by ibaines          ###   ########.fr       */
+/*   Updated: 2022/11/22 19:50:03 by ibaines          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,8 @@
 #include <readline/history.h>
 #include "minishell.h"
 #include <string.h>
+#define BOLD	"\001\033[1m\002"
+#define CLOSE	"\001\033[0m\002"
 
 
 #include <stdlib.h>
@@ -97,7 +99,6 @@ static int	ft_get_word(char *s, char c, char **ptr, int ptrlen)
 		ft_get_word(s + i, c, &ptr[k + 1], ptrlen - 1);
 	return (0);
 }
-
 static char	**ft_res_pointer(int ptr)
 {
 	char	**string;
@@ -133,32 +134,39 @@ char	**ft_splitraro(char const *s, char c)
 	rl_clear_history()
 	return(-1);
 }*/
-
-static char	*get_cmd(char **paths, char *cmd)
+/*
+int	ft_get_command(char **argcc, char **env)
 {
-	char	*tmp;
-	char	*command;
+	int		x;
+	int		i;
+	char	*ptr;
 
-	while (*paths)
+	i = 0;
+	while (env[i])
 	{
-		tmp = ft_strjoin(*paths, "/");
-		command = ft_strjoin(tmp, cmd);
-		free(tmp);
-		if (access(command, 0) == 0)
-			return (command);
-		free(command);
-		paths++;
+		ptr = ft_strjoin(env[i], argcc[0]);
+		x = access(ptr, X_OK);
+		if (x == 0)
+			execve(ptr, &argcc[0], env);
+		else
+		{
+			if (i == (ft_get_size(env) - 1))
+				ft_putstr2(argcc[0]);
+		}
+		free(ptr);
+		i++;
 	}
-	return (NULL);
-}
+	return (0);
+}*/
 
 int checker(char **paths, char *src)
 {
 	if (!ft_strncmp(src, "exit", 4))
 		exit (-1);
-	else if (!get_cmd(paths, src))
-		return(0);
-	printf("existe el cmd - ");
+	if (!ft_strncmp(src, "ls", 2))
+		system("ls");
+	// if (!get_cmd(paths, src))
+	// 	return(0);
 	// la salida de este preceso hay que cambiar con dup2
 	// execve(get_cmd(paths, src), &src, env);
 	return (0);
@@ -193,7 +201,7 @@ char	**ft_getpath(char **env)
 
 int	main(int argc, char **argv, char **env)
 {
-	const char	*src;
+	//const char	*src;
 	char		*ptr;
 	char		**ptr2;
 
@@ -208,15 +216,17 @@ int	main(int argc, char **argv, char **env)
 		i++;
 	}
 	printf("\n");
-	src = "\033[0;32mMinishell>\033[0m";
+	//src = /*green_start*/"Minishell>"/*green_end*/;
 	while (1)
 	{
-	ptr = readline(src);
-	checker(ptr2, ptr);
-	if (ft_strlen(ptr))
-		add_history(ptr);
-	printf("%s\n",  ptr);
-	free(ptr);
+		ptr = readline(BOLD "Minishell $> " CLOSE);
+		if (ptr == NULL)
+			exit(0);
+		checker(ptr2, ptr);
+		if (ft_strlen(ptr))
+			add_history(ptr);
+		printf("%s\n",  ptr);
+		free(ptr);
 	}
 	return (0);
 }
