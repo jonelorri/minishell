@@ -6,7 +6,7 @@
 /*   By: ibaines <ibaines@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/17 18:14:39 by ibaines           #+#    #+#             */
-/*   Updated: 2022/11/22 19:50:03 by ibaines          ###   ########.fr       */
+/*   Updated: 2022/11/23 20:10:03 by ibaines          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,13 +128,35 @@ char	**ft_splitraro(char const *s, char c)
 	return (array);
 }
 
-/*int close_mini(void)
+void	ft_putstr(char *str)
+{	
+	while (*(str) != '\0')
+	{	
+		write(2, str, 1);
+		str = str + 1;
+	}
+}
 
+
+void	ft_putstr2(char *str)
 {
-	rl_clear_history()
-	return(-1);
-}*/
-/*
+	ft_putstr("zsh: command not found: ");
+	ft_putstr(str);
+	ft_putstr("\n");
+}
+
+int	ft_get_size(char **str)
+{
+	int	i;
+
+	i = 0;
+	while (str[i])
+	{
+		i++;
+	}
+	return (i);
+}
+
 int	ft_get_command(char **argcc, char **env)
 {
 	int		x;
@@ -157,29 +179,41 @@ int	ft_get_command(char **argcc, char **env)
 		i++;
 	}
 	return (0);
-}*/
+}
+
+char **ft_first_check(char *src)
+{
+	char **ptr;
+
+	ptr = ft_split(src, '|');
+	if (!ptr)
+		return(NULL);
+	return(ptr);
+}
 
 int checker(char **paths, char *src)
 {
+	int pid;
+	
+	char **command;
+
+
+	
+	command = ft_split(src, ' ');
 	if (!ft_strncmp(src, "exit", 4))
 		exit (-1);
-	if (!ft_strncmp(src, "ls", 2))
-		system("ls");
-	// if (!get_cmd(paths, src))
-	// 	return(0);
-	// la salida de este preceso hay que cambiar con dup2
-	// execve(get_cmd(paths, src), &src, env);
+	pid = fork();
+	if (pid == 0)
+	{
+		
+	ft_get_command(command, paths);
+	}
+	else
+	{
+		waitpid(pid, NULL, 0);
+	}
 	return (0);
 }
-/*
-int	ft_strlen(char *str)
-{
-	int	i;
-
-	i = 0;
-	
-}
-*/
 
 char	**ft_getpath(char **env)
 {
@@ -225,7 +259,6 @@ int	main(int argc, char **argv, char **env)
 		checker(ptr2, ptr);
 		if (ft_strlen(ptr))
 			add_history(ptr);
-		printf("%s\n",  ptr);
 		free(ptr);
 	}
 	return (0);
