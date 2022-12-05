@@ -18,6 +18,7 @@ typedef struct s_mini
     int pid_id;
     char **env;
     t_env *env_new;
+    int env_len;
 }   t_mini ;
 
 

@@ -305,6 +305,16 @@ void	ft_export(char *src, t_mini *mini) // copiar env y añadir el eport
 		ft_make_export(src, mini);
 }
 
+void ft_make_unset(char *src, t_mini *mini, int line)
+{
+	printf("borrar esta linea %d\n", line);
+	mini->env_len = 0;
+	while (mini->env[mini->env_len])
+		mini->env_len ++;
+	if (mini->env_len)
+		mini->env_len -= 1;
+	printf("Tamaño env -> %d\n", mini->env_len);
+}
 
 void	ft_unset(char *src, t_mini *mini)
 {
@@ -316,6 +326,7 @@ void	ft_unset(char *src, t_mini *mini)
 		if (ft_strncmp(src + 6, mini->env[i], ft_check_var2(src + 6)) == 0 && (ft_strlen_export(mini->env[i]) == ft_strlen_export(src + 6)))
 		{
 			printf("liberar este\n");
+			ft_make_unset(src, mini, i);
 			return ;
 		}
 		i++;

@@ -1,6 +1,7 @@
 NAME= Minishell
 CC= gcc
-CFLAGS= -Wall -Wextra -Werror -g3
+# CFLAGS= -Wall -Wextra -Werror -g3
+CFLAGS= 
 SANITIZE= -fsanitize=address
 RM= rm -rf
 FILES= 	testeo \
