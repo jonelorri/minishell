@@ -251,8 +251,8 @@ int	ft_check_var2(char *src)
 	i = 0;
 	while (src[i] && src[i] != '=')
 		i++;
-	printf("%c ", src[i]);
-	printf("%d\n", i);
+	// printf("%c ", src[i]);
+	// printf("%d\n", i);
 	return(i);
 }
 
@@ -290,7 +290,7 @@ void	ft_make_export(char *src, t_mini *mini)
 	{
 		new_env[i] = ft_strdup(mini->env[i]);
 		i++;
-		printf("%d\n",i);
+		// printf("%d\n",i);
 	}
 	new_env[i] = ft_strdup(src + 7);
 	i++;
@@ -307,13 +307,28 @@ void	ft_export(char *src, t_mini *mini) // copiar env y añadir el eport
 
 void ft_make_unset(char *src, t_mini *mini, int line)
 {
-	printf("borrar esta linea %d\n", line);
+	char **new_env;
+	int	i;
+
+	i = 0;
 	mini->env_len = 0;
 	while (mini->env[mini->env_len])
 		mini->env_len ++;
-	if (mini->env_len)
-		mini->env_len -= 1;
-	printf("Tamaño env -> %d\n", mini->env_len);
+	new_env = (char **)malloc(sizeof(char *) * (mini->env_len + 1));
+	printf("------------\n");
+	//! PASAR STRDUP A MEMCPY
+	while (i < line)
+	{
+		new_env[i] = ft_strdup(mini->env[i]);
+		i ++;
+	}
+	while (mini->env[i + 1])
+	{
+		new_env[i] = ft_strdup(mini->env[i + 1]);
+		i ++;
+	}
+	ft_free_malloc2(mini->env);
+	mini->env = new_env;
 }
 
 void	ft_unset(char *src, t_mini *mini)
@@ -434,7 +449,7 @@ char **ft_malloc(char **src)
 	i = 0;
 	while (i < n)
 	{
-		printf("%d\n", i);
+		//printf("%d\n", i);
 		save[i] = ft_strdup(src[i]);
 		i++;
 	}
