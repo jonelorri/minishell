@@ -5,14 +5,20 @@
 #include "libftt/libft.h"
 
 int	ft_strncmp(const char *s1, const char *s2, size_t n);
+int	ft_free_malloc2(char **src);
 
+typedef struct s_env
+{
+    char *str;
+    struct s_env *next;
+}       t_env;
 
 typedef struct s_mini
 {
     int pid_id;
     char **env;
-    
-}   t_mini 
+    t_env *env_new;
+}   t_mini ;
 
 
 #endif
