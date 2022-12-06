@@ -314,19 +314,17 @@ void ft_make_unset(char *src, t_mini *mini, int line)
 	mini->env_len = 0;
 	while (mini->env[mini->env_len])
 		mini->env_len ++;
-	new_env = (char **)malloc(sizeof(char *) * (mini->env_len + 1));
-	printf("------------\n");
-	//! PASAR STRDUP A MEMCPY
-	while (i < line)
-	{
-		new_env[i] = ft_strdup(mini->env[i]);
-		i ++;
-	}
+	new_env = (char **)malloc(sizeof(char *) * (mini->env_len));
+
 	while (mini->env[i + 1])
 	{
-		new_env[i] = ft_strdup(mini->env[i + 1]);
-		i ++;
+		if (i < line)
+			new_env[i] = ft_strdup(mini->env[i]);
+		else
+			new_env[i] = ft_strdup(mini->env[i + 1]);
+		i++;
 	}
+	new_env[i] = NULL;
 	ft_free_malloc2(mini->env);
 	mini->env = new_env;
 }
