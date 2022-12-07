@@ -6,7 +6,7 @@
 /*   By: ibaines <ibaines@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/17 18:14:39 by ibaines           #+#    #+#             */
-/*   Updated: 2022/12/02 19:04:41 by ibaines          ###   ########.fr       */
+/*   Updated: 2022/12/07 20:20:15 by ibaines          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,6 @@
 #define CLOSE	"\001\033[0m\002"
 #include <stdlib.h>
 #include <signal.h>
-
 
 static int check;
 
@@ -347,36 +346,284 @@ void	ft_unset(char *src, t_mini *mini)
 	printf("no se ha encontrado la variabe\n");
 }
 ///
-int	ft_cd_swap(char *src, t_mini *mini)
-{		
+char	*ft_gethome(t_mini *mini)
+{
 	int		i;
+	char	*ptr;
 
 	i = 0;
-	while (mini->env[i])
+	while (mini->env[i] && i < mini->env_len - 1)
 	{
-		if (ft_strncmp(src + 3, mini->env[i], ft_check_var2(src + 3)) == 0 && (ft_strlen_export(mini->env[i]) == ft_strlen_export(src + 3)))
+		if (ft_strncmp("HOME", mini->env[i], ft_check_var2("HOME")) == 0 && (ft_strlen_export(mini->env[i]) == ft_strlen_export("HOME")))
+			return(mini->env[i] + 5);
+		i++;
+	}
+	return(NULL);
+}
+
+void	ft_printpwd(void)
+{
+	char	tmp[PATH_MAX];
+
+	if (getcwd(tmp, sizeof(tmp)) == 0)
+	{
+		printf("Error getcwd\n");
+		return ;
+	}
+	printf("%s\n", tmp);
+}
+
+char	*ft_pwd(void)
+{
+	char	tmp[PATH_MAX];
+	char	*dir;
+
+	if (getcwd(tmp, sizeof(tmp)) == 0)
+	{
+		printf("Error getcwd\n");
+		return (NULL);
+	}
+	//printf("%s\n", tmp);
+	dir = ft_strdup(tmp);
+	return (dir);
+}
+
+int	ft_cd_swap(char *str, t_mini *mini)
+{		
+	int		i;
+	int		j;
+	char	*ptr;
+
+	i = 0;
+	j = 0;
+	while (mini->env[i] && i < mini->env_len - 1)
+	{
+		if (ft_strncmp("PWD", mini->env[i], ft_check_var2("PWD")) == 0 && (ft_strlen_export(mini->env[i]) == ft_strlen_export("PWD")))
+		{	
+			ptr = mini->env[i];//ahora antiguo
+			mini->env[i] = ft_strjoin("PWD=", str); // juntar  
+		}
+		if (ft_strncmp("OLDPWD", mini->env[i], ft_check_var2("OLDPWD")) == 0 && (ft_strlen_export(mini->env[i]) == ft_strlen_export("OLDPWD")))
+		{	
+			free(mini->env[i]);
+			mini->env[i] = ft_strjoin("OLDPWD", ptr + 3);
+			free(ptr);
+		}
+		i++;
+	}
+	free(str);
+	return(0);
+}
+
+int	ft_swap_pwd(char *str, t_mini *mini)
+{
+	int		i;
+	char	*ptr;
+
+	i = 0;
+	while (mini->env[i] && i < mini->env_len - 1)
+	{
+		if (ft_strncmp("PWD", mini->env[i], ft_check_var2("PWD")) == 0 && (ft_strlen_export(mini->env[i]) == ft_strlen_export("PWD")))
 		{
 			free(mini->env[i]);
-			mini->env[i] = ft_strdup(src + 7);
-			return(1);
+		//printf("**********\n");
+			mini->env[i] = ft_strjoin("PWD", str + 6);
 		}
 		i++;
 	}
 	return(0);
 }
 
-int		ft_cd(char *str, t_mini *mini)
-{
-	printf("%s\n", mini->env[0]);
-	if (chdir(str + 3) == -1)
+int	ft_cd_swap1(char *str, t_mini *mini)
+{		
+	int		i;
+	int		j;
+	char	*ptr;
+	char	*tmp;
+
+	i = 0;
+	j = 0;
+	while (mini->env[i] && i < mini->env_len - 1)
 	{
-		printf("cd: no such file or directory: %s\n", str + 3);
+		if (ft_strncmp("PWD", mini->env[i], ft_check_var2("PWD")) == 0 && (ft_strlen_export(mini->env[i]) == ft_strlen_export("PWD")))
+			ptr = mini->env[i];//ahora antiguo
+		if (ft_strncmp("OLDPWD", mini->env[i], ft_check_var2("OLDPWD")) == 0 && (ft_strlen_export(mini->env[i]) == ft_strlen_export("OLDPWD")))
+		{	
+			tmp = ft_strdup(mini->env[i]);
+			mini->env[i] = ft_strjoin("OLDPWD", ptr + 3);
+			ft_swap_pwd(tmp, mini);
+			free(tmp);
+		}
+		i++;
+	}
+	return(0);
+}
+
+int	ft_cd_find(char *str, t_mini *mini)
+{		
+	int		i;
+	int		j;
+	char	*ptr;
+
+	i = 0;
+	j = 0;
+	while (mini->env[i] && i < mini->env_len - 1)
+	{
+		if (ft_strncmp(str, mini->env[i], ft_check_var2(str)) == 0 && (ft_strlen_export(mini->env[i]) == ft_strlen_export(str)))
+		{
+			printf("i = %d\n");
+			return (i);
+		}
+		i++;
+	}
+	return(0);
+}
+
+int	ft_cd_swap2(char *str, t_mini *mini)
+{		
+	int		i;
+	int		j;
+	char	*ptr;
+
+	i = 0;
+	j = 0;
+	while (mini->env[i] && i < mini->env_len - 1)
+	{
+		if (ft_strncmp("PWD", mini->env[i], ft_check_var2("PWD")) == 0 && (ft_strlen_export(mini->env[i]) == ft_strlen_export("PWD")))
+		{	
+			ptr = mini->env[i];//ahora antiguo
+			while(mini->env[i][j])
+				j++;
+			j = j - 2;
+			while(mini->env[i][j] != '/')
+				j--;
+			mini->env[i] = (char *)malloc(j + 1);
+			ft_strncpy(mini->env[i], ptr, j);
+			mini->env[i][j] = '\0';
+		}
+		if (ft_strncmp("OLDPWD", mini->env[i], ft_check_var2("OLDPWD")) == 0 && (ft_strlen_export(mini->env[i]) == ft_strlen_export("OLDPWD")))
+		{	
+			free(mini->env[i]);
+			mini->env[i] = ft_strjoin("OLDPWD", ptr + 3);
+			free(ptr);
+		}
+		i++;
+	}
+	return(0);
+}
+
+int	ft_cd_swap3(char *str, t_mini *mini)
+{		
+	int		i;
+	int		j;
+	char	*ptr;
+
+	i = 0;
+	j = 0;
+	while (mini->env[i] && i < mini->env_len - 1)
+	{
+		if (ft_strncmp("PWD", mini->env[i], ft_check_var2("PWD")) == 0 && (ft_strlen_export(mini->env[i]) == ft_strlen_export("PWD")))
+			ptr = mini->env[i];//ahora antiguo
+		if (ft_strncmp("OLDPWD", mini->env[i], ft_check_var2("OLDPWD")) == 0 && (ft_strlen_export(mini->env[i]) == ft_strlen_export("OLDPWD")))
+		{	
+			free(mini->env[i]);
+			mini->env[i] = ft_strjoin("OLDPWD", ptr + 3);
+			//free(ptr);
+		}
+		i++;
+	}
+	return(0);
+}
+
+int	ft_cd_swap4(t_mini *mini)
+{		
+	int		i;
+	int		j;
+	char	*ptr;
+
+	i = 0;
+	j = 0;
+	while (mini->env[i] && i < mini->env_len - 1)
+	{
+		if (ft_strncmp("PWD", mini->env[i], ft_check_var2("PWD")) == 0 && (ft_strlen_export(mini->env[i]) == ft_strlen_export("PWD")))
+		{	
+			ptr = mini->env[i];//ahora antiguo
+			mini->env[i] = ft_strjoin("PWD=", ft_gethome(mini));
+		}
+		if (ft_strncmp("OLDPWD", mini->env[i], ft_check_var2("OLDPWD")) == 0 && (ft_strlen_export(mini->env[i]) == ft_strlen_export("OLDPWD")))
+		{	
+			free(mini->env[i]);
+			mini->env[i] = ft_strjoin("OLDPWD", ptr + 3);
+			free(ptr);
+		}
+		i++;
+	}
+	return(0);
+}
+
+int	ft_check_cd(char *str, t_mini *mini)
+{
+	if (ft_strlen(str - 3) == 2)
+	{
+		printf("MINISHELL: cd: HOME not set\n");
+		if (ft_gethome(mini) == NULL)
+		{
+			return(0);
+		}
+		ft_cd_swap4(mini);
+		return(0);
+	}
+	if (ft_strlen(str) == 1 && str[0] == '-')
+	{
+		ft_cd_swap1(str, mini);
+		return(0);
+	}
+	if (ft_strlen(str) == 2 && !ft_strncmp("..", str, 2))
+
+	{
+		ft_cd_swap2(str, mini);
+		return (-1);
+	}
+	if (ft_strlen(str) == 1 && str[0] == '.')
+	{
+		ft_cd_swap3(str, mini);
 		return (0);
 	}
-	
-	//cambiar env las variables oldpwd, pwd
+	return (-1);
+}
+
+
+
+int		ft_cd(char *str, t_mini *mini)
+{
+	//printf("%s\n", mini->env[0]);
+	if (ft_strlen(str) != 2)
+	{
+		if (chdir(str + 3) == -1 && str[3] != '-')
+		{
+			printf("cd: no such file or directory: %s\n", str + 3);
+			return (0);
+		}
+		if (ft_strlen(str) == 4 && str[3] == '-' && chdir(mini->env[ft_cd_find("OLDPWD", mini)] + 7) == -1)
+		{
+			printf("cd: no such file or directory: %s\n", mini->env[ft_cd_find("OLDPWD", mini)] + 7);
+			return (0);
+		}
+	}
+	else if (chdir(ft_gethome(mini)) == -1 && ft_gethome(mini) != NULL)
+	{
+		printf("cd: no such file or directory: %s\n", ft_gethome(mini));
+		return (0);
+	}
+	else if (chdir(ft_gethome(mini)) == -1 && ft_gethome(mini) == NULL)
+	{
+		printf("MINISHELL: cd: HOME not set\n");
+		return (0);
+	}
+	ft_cd_swap(ft_pwd(), mini);
 	return (1);
 }
+
 
 int checker(char **paths, char *src, t_mini *mini)
 {
@@ -406,6 +653,11 @@ int checker(char **paths, char *src, t_mini *mini)
 		ft_cd(src, mini);
 		return(0);
 	}
+	if (!ft_strncmp(src, "pwd", 2))
+	{	
+		ft_printpwd();
+		return(0);
+	}
 	pid = fork();
 	if (pid == 0)
 		ft_get_command(command, paths);
@@ -430,7 +682,7 @@ int	ft_free_malloc2(char **src)
 	return(1);
 }
 
-char **ft_malloc(char **src)
+char **ft_malloc(char **src, t_mini *mini)
 {
 	char	**save;
 	int		i;
@@ -452,6 +704,8 @@ char **ft_malloc(char **src)
 		i++;
 	}
 	save[i] = NULL;
+	i--;
+	mini->env_len = i;
 	return(save);
 }
 
@@ -463,7 +717,7 @@ int	main(int argc, char **argv, char **env)
 	t_mini 		mini;
 	int i;
 
-	mini.env = ft_malloc(env);
+	mini.env = ft_malloc(env, &mini);
 	i = 0;
  	check = 1;
    	signal(SIGINT, sighandler);

@@ -6,7 +6,7 @@
 /*   By: ibaines <ibaines@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/26 13:42:07 by ibaines           #+#    #+#             */
-/*   Updated: 2022/12/05 11:27:04 by ibaines          ###   ########.fr       */
+/*   Updated: 2022/12/06 17:54:46 by ibaines          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,4 +113,6 @@ void	ft_lstclear(t_list **lst, void (*del)(void *));
 void	ft_lstiter(t_list *lst, void (*f)(void *));
 
 t_list	*ft_lstmap(t_list *lst, void *(*f)(void *), void (*del)(void *));
+
+char	*ft_strncpy(char *dest, char *src, unsigned int n);
 #endif

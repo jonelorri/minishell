@@ -22,14 +22,17 @@ OBJ= $(addsuffix .o, $(FILES))
 	$(CC) $(CFLAGS) $(F_READLINE) $(SANITIZE) -o $@ -c $^
 
 $(NAME): $(OBJ) 
+	${MAKE} -s -C libftt
 	$(CC) $(CFLAGS) $(LIBFT) $(SANITIZE)  $(COMPILE) -o $(NAME) $(OBJ)
 
 all: $(NAME)
 
 clean: 
+	${MAKE} clean -s -C libftt
 	$(RM) $(OBJ)
 
 fclean: clean
+	${MAKE} fclean -s -C libftt
 	$(RM) $(NAME)
 
 re: fclean all
