@@ -768,6 +768,7 @@ int	main(int argc, char **argv, char **env)
 	//const char	*src;
 	char		*ptr;
 	char		**ptr2;
+	char		**splited_argv;
 	t_mini 		mini;
 	int i;
 	int	pid; ///
@@ -790,21 +791,38 @@ int	main(int argc, char **argv, char **env)
 		if (ptr == NULL)
 			//continue;
 			return(-1);
-		pid = fork();
-		if (pid == 0)
-		{
-			checker(ptr2, ptr, &mini);
-			exit (-1);
-		}
-		else
-		{
-			if (!ft_strncmp(ptr, "exit", 4))
-				exit (-1);
-			waitpid(pid, NULL, 0);
-		}
 		if (ft_strlen(ptr))
 			add_history(ptr);
-		free(ptr);
+		if (open_quotes(ptr) < 0)
+			printf("Minishell: Syntax error\n");
+		else
+		{
+			splited_argv = ft_split_pipes(ptr);
+			if (!splited_argv)
+			{
+				printf("NO habia pipes\n");
+				splited_argv = ft_split_quotes(ptr);
+				if (!splited_argv)
+					printf("NO habia quotes\n");
+				else
+					printf("Habia quotes\n");
+			}
+			else
+				printf("Habia pipes\n");
+			pid = fork();
+			if (pid == 0)
+			{
+				checker(ptr2, ptr, &mini);
+				exit (-1);
+			}
+			else
+			{
+				if (!ft_strncmp(ptr, "exit", 4))
+					exit (-1);
+				waitpid(pid, NULL, 0);
+			}
+			free(ptr);
+		}
 	}
 	ft_free_malloc2(mini.env);
 	return (0);
