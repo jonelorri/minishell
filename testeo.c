@@ -6,7 +6,7 @@
 /*   By: ibaines <ibaines@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/17 18:14:39 by ibaines           #+#    #+#             */
-/*   Updated: 2022/12/14 17:31:32 by ibaines          ###   ########.fr       */
+/*   Updated: 2022/12/15 13:59:06 by ibaines          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,11 +28,20 @@ void	ft_exit(int num)
 	g_error = num;
 }
 
-void sighandler(int signum) {
+void sighandler(int signum)
+{
+	char c;
 
-	printf("%d\n", signum);
+	c = 127;
+	//printf("%d\n", signum);
     if (signum == 2)
-   {   }
+   {  
+		write(1, &c, 1);
+		rl_on_new_line();
+		write(1, "\n", 1);
+		rl_replace_line("", 1);
+		rl_redisplay();
+}
 }
 
 static int	ft_len_ptr(char *s, char c)
@@ -156,6 +165,8 @@ void	ft_putstr2(char *str)
 	ft_putstr("zsh: command not found: ");
 	ft_putstr(str);
 	ft_putstr("\n");
+	ft_exit(127);
+	exit(127);
 }
 
 int	ft_get_size(char **str)
@@ -284,7 +295,7 @@ void	ft_make_export(char *src, t_mini *mini)
 	while (mini->env[i])
 		i++;
 	i++;
-	printf("mtrx len-> %d\n", i);
+	//printf("mtrx len-> %d\n", i);
 	new_env = (char **)malloc(sizeof(char *) * (i + 1));
 	i = 0;
 	while (mini->env[i])
@@ -300,14 +311,36 @@ void	ft_make_export(char *src, t_mini *mini)
 	mini->env = new_env;
 }
 
+int	ft_valid_export(char *src)
+{
+	int	i;
+	int	n;
+
+	i = 0;
+	n = 0;
+	while (src[i] && src[i] != '=')
+	{
+		if (!ft_isalnum(src[i]))
+		{
+			printf("Minishell: export: %s: not a valid identifier\n", src);
+			return(0);
+		}
+		i++;
+	}
+	return(1);
+}
+
 void	ft_export(char *src, t_mini *mini) // copiar env y añadir el export
 {
-	if (!ft_check_var(src, mini))
+	if (ft_valid_export(src + 7))
 	{
-		ft_make_export(src, mini);
+		if (!ft_check_var(src, mini))
+		{
+			ft_make_export(src, mini);
+			ft_exit(0);
+		}
 		ft_exit(0);
 	}
-	ft_exit(0);
 }
 
 void ft_make_unset(char *src, t_mini *mini, int line)
@@ -476,7 +509,7 @@ int	ft_cd_find(char *str, t_mini *mini)
 	{
 		if (ft_strncmp(str, mini->env[i], ft_check_var2(str)) == 0 && (ft_strlen_export(mini->env[i]) == ft_strlen_export(str)))
 		{
-			printf("i = %d\n");
+			//printf("i = %d\n");
 			return (i);
 		}
 		i++;
@@ -628,6 +661,15 @@ int		ft_cd(char *str, t_mini *mini)
 	return (1);
 }
 
+int	ft_echo(char *src, t_mini *mini)
+{
+	int i;
+
+	i = ft_strlen(src + 4);
+	
+	printf("%s", src);
+	
+}
 
 int checker(char **paths, char *src, t_mini *mini)
 {
@@ -637,32 +679,37 @@ int checker(char **paths, char *src, t_mini *mini)
 	command = ft_split(src, ' ');
 	if (!ft_strncmp(src, "exit", 4))
 		exit (-1);
-	if (!ft_strncmp(src, "env", 3))
+	else if (!ft_strncmp(src, "env", 3))
 	{	
 		ft_env(mini);
 		return(0);
 	}
-	if (!ft_strncmp(src, "export", 6))
+	else if (!ft_strncmp(src, "echo", 4))
+	{	
+		ft_echo(src, mini);
+		return(0);
+	}
+	else if (!ft_strncmp(src, "export", 6))
 	{	
 		ft_export(src, mini);
 		return(0);
 	}
-	if (!ft_strncmp(src, "unset", 5))
+	else if (!ft_strncmp(src, "unset", 5))
 	{	
 		ft_unset(src, mini);
 		return(0);
 	}
-	if (!ft_strncmp(src, "cd", 2))
+	else if (!ft_strncmp(src, "cd", 2))
 	{	
 		ft_cd(src, mini);
 		return(0);
 	}
-	if (!ft_strncmp(src, "pwd", 2))
+	else if (!ft_strncmp(src, "pwd", 2))
 	{	
 		ft_printpwd();
 		return(0);
 	}
-	if (ft_strlen(src) > 0)
+	/*else if (ft_strlen(src) > 0)
 	{
 		pid = fork();
 		if (pid == 0)
@@ -671,7 +718,7 @@ int checker(char **paths, char *src, t_mini *mini)
 		{
 			waitpid(pid, NULL, 0);
 		}
-	}
+	}*/
 	return (0);
 }
 
@@ -701,7 +748,7 @@ char **ft_malloc(char **src, t_mini *mini)
 		i++;
 	}
 	n = i;
-	printf("%s\n", src[i]);
+	//printf("%s\n", src[i]);
 	save = (char **)malloc(sizeof(char *) * (i + 1));
 	i = 0;
 	while (i < n)
@@ -723,6 +770,7 @@ int	main(int argc, char **argv, char **env)
 	char		**ptr2;
 	t_mini 		mini;
 	int i;
+	int	pid; ///
 
 	mini.env = ft_malloc(env, &mini);
 	i = 0;
@@ -738,10 +786,22 @@ int	main(int argc, char **argv, char **env)
 	while (1)
 	{
 		ptr = readline(BOLD "Minishell $> " CLOSE);
-		printf("%s\n", ptr);
+		//printf("%s\n", ptr);
 		if (ptr == NULL)
-			continue;
-		checker(ptr2, ptr, &mini);
+			//continue;
+			return(-1);
+		pid = fork();
+		if (pid == 0)
+		{
+			checker(ptr2, ptr, &mini);
+			exit (-1);
+		}
+		else
+		{
+			if (!ft_strncmp(ptr, "exit", 4))
+				exit (-1);
+			waitpid(pid, NULL, 0);
+		}
 		if (ft_strlen(ptr))
 			add_history(ptr);
 		free(ptr);
